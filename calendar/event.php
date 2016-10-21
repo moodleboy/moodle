@@ -159,8 +159,7 @@ if ($data) {
     if ($allday == 1) {
         $data->timeduration = (calendar_get_minutes_day($data->timestart) - 1) * MINSECS;
         $data->timestart = strtotime("midnight", ($data->timestart));
-    }
-    else if ($data->duration == 1) {
+    } else if ($data->duration == 1) {
         $data->timeduration = $data->timedurationuntil- $data->timestart;
     } else if ($data->duration == 2) {
         $data->timeduration = $data->timedurationminutes * MINSECS;

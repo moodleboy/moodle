@@ -48,7 +48,9 @@ class event_form extends moodleform {
         $newevent = (empty($this->_customdata->event) || empty($this->_customdata->event->id));
         $repeatedevents = (!empty($this->_customdata->event->eventrepeats) && $this->_customdata->event->eventrepeats>0);
         $hasduration = (!empty($this->_customdata->hasduration) && $this->_customdata->hasduration);
-        $isallday = (!empty($this->_customdata->hasduration) && ($this->_customdata->event->timeduration == (calendar_get_minutes_day($this->_customdata->event->timestart) - 1) * MINSECS) && ($this->_customdata->event->timestart == strtotime("midnight", ($this->_customdata->event->timestart))));
+        $isallday = (!empty($this->_customdata->hasduration) && ($this->_customdata->event->timeduration == 
+				(calendar_get_minutes_day($this->_customdata->event->timestart) - 1) * MINSECS) && 
+				($this->_customdata->event->timestart == strtotime("midnight", ($this->_customdata->event->timestart))));
         $mform->addElement('header', 'general', get_string('general'));
 
         if ($newevent) {
@@ -113,7 +115,7 @@ class event_form extends moodleform {
 
         $mform->addElement('date_time_selector', 'timestart', get_string('date'));
         $mform->addRule('timestart', get_string('required'), 'required');
-        
+
         $mform->addElement('checkbox', 'allday', get_string('allday' , 'calendar'));
         $mform->setType('allday', PARAM_RAW);
         $mform->setDefault('allday', 0);
@@ -150,8 +152,8 @@ class event_form extends moodleform {
         $mform->setType('timedurationminutes', PARAM_INT);
         $mform->disabledIf('timedurationminutes','duration','noteq', 2);
 
-        $mform->setDefault('duration', ($hasduration && !$isallday)?1:0);
-        $mform->setDefault('allday', ($isallday?1:0));
+        $mform->setDefault('duration', ($hasduration && !$isallday) ? 1 : 0);
+        $mform->setDefault('allday', ($isallday ? 1 : 0));
 
         if ($newevent) {
 
@@ -201,7 +203,7 @@ class event_form extends moodleform {
 
         }
 
-        if(!isset($data['allday'])) {
+        if (!isset($data['allday'])) {
             if ($data['duration'] == 1 && $data['timestart'] > $data['timedurationuntil']) {
                 $errors['timedurationuntil'] = get_string('invalidtimedurationuntil', 'calendar');
             } else if ($data['duration'] == 2 && (trim($data['timedurationminutes']) == '' || $data['timedurationminutes'] < 1)) {

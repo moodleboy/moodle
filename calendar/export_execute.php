@@ -200,18 +200,20 @@ foreach($events as $event) {
     $ev->add_property('class', 'PUBLIC'); // PUBLIC / PRIVATE / CONFIDENTIAL
     $ev->add_property('last-modified', Bennu::timestamp_to_datetime($event->timemodified));
     $ev->add_property('dtstamp', Bennu::timestamp_to_datetime()); // now
-    if ($event->timeduration == ((calendar_get_minutes_day($event->timestart) - 1) * MINSECS) && $event->timestart == strtotime(date('d-m-Y H:i:s', strtotime('today', $event->timestart)))) {
-        //If event starts at midnight, and if duration is one minute less than the total number of minutes in the day, it is an all day event
+    if ($event->timeduration == ((calendar_get_minutes_day($event->timestart) - 1) * MINSECS) &&
+	        $event->timestart == strtotime(date('d-m-Y H:i:s', strtotime('today', $event->timestart)))) {
+        // If event starts at midnight, and if duration is one minute less than the total number of minutes in the day,
+		// then it is an all day event.
         $ev->add_property('dtstart', Bennu::timestamp_to_date($event->timestart), array('value' => 'DATE')); // All day event.
-        $ev->add_property('dtend', Bennu::timestamp_to_date($event->timestart + DAYSECS), array('value' => 'DATE')); // All day
+        $ev->add_property('dtend', Bennu::timestamp_to_date($event->timestart + DAYSECS), array('value' => 'DATE')); // All day.
     } else if ($event->timeduration > 0) {
-        //dtend is better than duration, because it works in Microsoft Outlook and works better in Korganizer
+        // dtend is better than duration, because it works in Microsoft Outlook and works better in Korganizer.
         $ev->add_property('dtstart', Bennu::timestamp_to_datetime($event->timestart)); // when event starts.
         $ev->add_property('dtend', Bennu::timestamp_to_datetime($event->timestart + $event->timeduration));
     } else {
         // When no duration is present, make start time the same as end time.
         $ev->add_property('dtstart', Bennu::timestamp_to_datetime($event->timestart)); // when event starts.
-        $ev->add_property('dtend', Bennu::timestamp_to_datetime($event->timestart + 1)); // Since no duration, end and start same.event.
+        $ev->add_property('dtend', Bennu::timestamp_to_datetime($event->timestart + 1)); // Since no duration, end and start same.
     }
     if ($event->courseid != 0) {
         $coursecontext = context_course::instance($event->courseid);

@@ -3340,21 +3340,20 @@ function calendar_get_calendar_context($subscription) {
 }
 
 /**
- *
  * Get minutes in current day, required for all day events during DST transitions
  *
- * @param int $startdate timestamp of start date of event
- * @return int number of total minutes in day
+ * @param int  $startdate The timestamp of start date of event
+ * @return int Number of total minutes in the given day
  */
 
 function calendar_get_minutes_day($startdate) {
-    $dt = new DateTime();    
-    $dt->setTimestamp($startdate); 
+    $dt = new DateTime();
+    $dt->setTimestamp($startdate);
     $dt->modify("today");
     $dt2 = clone $dt;
     $dt2->modify("tomorrow");
-    
+
     $minutes = ($dt2->getTimestamp() - $dt->getTimestamp()) / MINSECS;
-    
+
     return $minutes;
 }
