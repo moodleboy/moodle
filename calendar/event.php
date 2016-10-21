@@ -61,6 +61,7 @@ $day = optional_param('cal_d', 0, PARAM_INT);
 $month = optional_param('cal_m', 0, PARAM_INT);
 $year = optional_param('cal_y', 0, PARAM_INT);
 $time = optional_param('time', 0, PARAM_INT);
+$allday = optional_param('allday', 0, PARAM_INT);
 
 // If a day, month and year were passed then convert it to a timestamp. If these were passed
 // then we can assume the day, month and year are passed as Gregorian, as no where in core
@@ -155,7 +156,11 @@ $mform = new event_form(null, $formoptions);
 $mform->set_data($properties);
 $data = $mform->get_data();
 if ($data) {
-    if ($data->duration == 1) {
+    if ($allday == 1) {
+        $data->timeduration = (calendar_get_minutes_day($data->timestart) - 1) * MINSECS;
+        $data->timestart = strtotime("midnight", ($data->timestart));
+    }
+    else if ($data->duration == 1) {
         $data->timeduration = $data->timedurationuntil- $data->timestart;
     } else if ($data->duration == 2) {
         $data->timeduration = $data->timedurationminutes * MINSECS;

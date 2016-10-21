@@ -1675,7 +1675,7 @@ function calendar_format_event_time($event, $now, $linkparams = null, $usecommon
         // Check if we will still be on the same day.
         if ($usermidnightstart == $usermidnightend) {
             // Check if we are running all day.
-            if ($event->timeduration == DAYSECS) {
+            if ($event->timeduration == (calendar_get_minutes_day($event->timestart) - 1) * MINSECS) {
                 $time = get_string('allday', 'calendar');
             } else { // Specify the time we will be running this from.
                 $datestart = calendar_time_representation($starttime);
@@ -3010,7 +3010,7 @@ function calendar_add_icalendar_event($event, $courseid, $subscriptionid, $timez
         date_default_timezone_set($timezone);
         if (date('H:i:s', $eventrecord->timestart) === "00:00:00") {
             // This event should be an all day event.
-            $eventrecord->timeduration = 0;
+            $eventrecord->timeduration = (calendar_get_minutes_day($eventrecord->timestart) - 1) * MINSECS;
         }
         core_date::set_default_server_timezone();
     }
@@ -3337,4 +3337,24 @@ function calendar_get_calendar_context($subscription) {
         $context = context_user::instance($subscription->userid);
     }
     return $context;
+}
+
+/**
+ *
+ * Get minutes in current day, required for all day events during DST transitions
+ *
+ * @param int $startdate timestamp of start date of event
+ * @return int number of total minutes in day
+ */
+
+function calendar_get_minutes_day($startdate) {
+    $dt = new DateTime();    
+    $dt->setTimestamp($startdate); 
+    $dt->modify("today");
+    $dt2 = clone $dt;
+    $dt2->modify("tomorrow");
+    
+    $minutes = ($dt2->getTimestamp() - $dt->getTimestamp()) / MINSECS;
+    
+    return $minutes;
 }

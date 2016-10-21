@@ -48,6 +48,7 @@ class event_form extends moodleform {
         $newevent = (empty($this->_customdata->event) || empty($this->_customdata->event->id));
         $repeatedevents = (!empty($this->_customdata->event->eventrepeats) && $this->_customdata->event->eventrepeats>0);
         $hasduration = (!empty($this->_customdata->hasduration) && $this->_customdata->hasduration);
+        $isallday = (!empty($this->_customdata->hasduration) && ($this->_customdata->event->timeduration == (calendar_get_minutes_day($this->_customdata->event->timestart) - 1) * MINSECS) && ($this->_customdata->event->timestart == strtotime("midnight", ($this->_customdata->event->timestart))));
         $mform->addElement('header', 'general', get_string('general'));
 
         if ($newevent) {
@@ -112,6 +113,10 @@ class event_form extends moodleform {
 
         $mform->addElement('date_time_selector', 'timestart', get_string('date'));
         $mform->addRule('timestart', get_string('required'), 'required');
+        
+        $mform->addElement('checkbox', 'allday', get_string('allday' , 'calendar'));
+        $mform->setType('allday', PARAM_RAW);
+        $mform->setDefault('allday', 0);
 
         $mform->addElement('header', 'durationdetails', get_string('eventduration', 'calendar'));
 
@@ -131,10 +136,22 @@ class event_form extends moodleform {
         $mform->disabledIf('timedurationuntil[hour]',   'duration', 'noteq', 1);
         $mform->disabledIf('timedurationuntil[minute]', 'duration', 'noteq', 1);
 
+        $mform->disabledIf('duration',                  'allday',   'noteq', 0);
+        $mform->disabledIf('timedurationuntil',         'allday',   'noteq', 0);
+        $mform->disabledIf('timedurationuntil[day]',    'allday',   'noteq', 0);
+        $mform->disabledIf('timedurationuntil[month]',  'allday',   'noteq', 0);
+        $mform->disabledIf('timedurationuntil[year]',   'allday',   'noteq', 0);
+        $mform->disabledIf('timedurationuntil[hour]',   'allday',   'noteq', 0);
+        $mform->disabledIf('timedurationuntil[minute]', 'allday',   'noteq', 0);
+        $mform->disabledIf('timedurationminutes',       'allday',   'noteq', 0);
+        $mform->disabledIf('timestart[hour]',           'allday',   'noteq', 0);
+        $mform->disabledIf('timestart[minute]',         'allday',   'noteq', 0);
+
         $mform->setType('timedurationminutes', PARAM_INT);
         $mform->disabledIf('timedurationminutes','duration','noteq', 2);
 
-        $mform->setDefault('duration', ($hasduration)?1:0);
+        $mform->setDefault('duration', ($hasduration && !$isallday)?1:0);
+        $mform->setDefault('allday', ($isallday?1:0));
 
         if ($newevent) {
 
@@ -184,10 +201,12 @@ class event_form extends moodleform {
 
         }
 
-        if ($data['duration'] == 1 && $data['timestart'] > $data['timedurationuntil']) {
-            $errors['timedurationuntil'] = get_string('invalidtimedurationuntil', 'calendar');
-        } else if ($data['duration'] == 2 && (trim($data['timedurationminutes']) == '' || $data['timedurationminutes'] < 1)) {
-            $errors['timedurationminutes'] = get_string('invalidtimedurationminutes', 'calendar');
+        if(!isset($data['allday'])) {
+            if ($data['duration'] == 1 && $data['timestart'] > $data['timedurationuntil']) {
+                $errors['timedurationuntil'] = get_string('invalidtimedurationuntil', 'calendar');
+            } else if ($data['duration'] == 2 && (trim($data['timedurationminutes']) == '' || $data['timedurationminutes'] < 1)) {
+                $errors['timedurationminutes'] = get_string('invalidtimedurationminutes', 'calendar');
+            }
         }
 
         return $errors;
