@@ -223,33 +223,6 @@ img.activityicon {
     vertical-align: middle;
 }
 
-.boxaligncenter {
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.boxalignright {
-    margin-left: auto;
-    margin-right: 0;
-}
-
-.boxalignleft {
-    margin-left: 0;
-    margin-right: auto;
-}
-
-.boxwidthnarrow {
-    width: 30%;
-}
-
-.boxwidthnormal {
-    width: 50%;
-}
-
-.boxwidthwide {
-    width: 80%;
-}
-
 .headermain {
     font-weight: bold;
 }
@@ -1254,6 +1227,11 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
     }
 }
 
+/** Moodle modals. */
+.modal.show {
+    display: block;
+}
+
 /* Moodle Dialogue Settings (moodle-core-dialogue)  */
 .moodle-dialogue-base .moodle-dialogue-lightbox {
     background-color: $gray;
@@ -2177,3 +2155,55 @@ ul {
     background-image: url([[pix:theme|yui2-treeview-sprite-rtl]]);
 }
 */
+
+.hover-tooltip-container {
+    position: relative;
+
+    .hover-tooltip {
+        opacity: 0;
+        visibility: hidden;
+        position: absolute;
+        left: 50%;
+        top: calc(-50% - 5px);
+        transform: translate(-50%, -50%);
+        background-color: #fff;
+        border: 1px solid rgba(0, 0, 0, .2);
+        border-radius: .3rem;
+        box-sizing: border-box;
+        padding: 5px;
+        white-space: nowrap;
+        transition: opacity 0.15s, visibility 0.15s;
+        z-index: 1000;
+
+        &:before {
+            content: '';
+            display: inline-block;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid rgba(0, 0, 0, .2);
+            position: absolute;
+            bottom: -8px;
+            left: calc(50% - 8px);
+        }
+
+        &:after {
+            content: '';
+            display: inline-block;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-top: 7px solid #fff;
+            position: absolute;
+            bottom: -6px;
+            left: calc(50% - 7px);
+            z-index: 2;
+        }
+    }
+
+    &:hover {
+        .hover-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.15s 0.5s, visibility 0.15s 0.5s;
+        }
+    }
+}

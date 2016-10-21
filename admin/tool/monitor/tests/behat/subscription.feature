@@ -98,12 +98,13 @@ Feature: tool_monitor_subscriptions
     Then I should see "Subscription successfully removed"
     And "#toolmonitorsubs_r0" "css_element" should not exist
 
+  @_bug_phantomjs
   Scenario: Receiving notification on site level
     Given I log in as "admin"
     And I follow "Preferences" in the user menu
-    And I follow "Messaging"
-    And I click on "input[name^=tool_monitor_notification_loggedin]" "css_element"
-    And I press "Save changes"
+    And I click on "Notification preferences" "link" in the "#page-content" "css_element"
+    And I click on ".preference-state" "css_element" in the "Notifications of rule subscriptions" "table_row"
+    And I wait until the page is ready
     And I follow "Preferences" in the user menu
     And I follow "Event monitoring"
     And I set the field "Select a course" to "Acceptance test site"
@@ -113,16 +114,18 @@ Feature: tool_monitor_subscriptions
     And I am on site homepage
     And I trigger cron
     And I am on site homepage
-    When I follow "Messages" in the user menu
-    And I follow "Do not reply to this email (1)"
-    Then I should see "The course was viewed."
+    When I click on ".popover-region-notifications" "css_element"
+    And I click on "View more" "link" in the ".popover-region-notifications" "css_element"
+    Then I should see "New rule site level"
+    And I should see "The course was viewed"
 
+  @_bug_phantomjs
   Scenario: Receiving notification on course level
     Given I log in as "teacher1"
     And I follow "Preferences" in the user menu
-    And I follow "Messaging"
-    And I click on "input[name^=tool_monitor_notification_loggedin]" "css_element"
-    And I press "Save changes"
+    And I click on "Notification preferences" "link" in the "#page-content" "css_element"
+    And I click on ".preference-state" "css_element" in the "Notifications of rule subscriptions" "table_row"
+    And I wait until the page is ready
     And I follow "Preferences" in the user menu
     And I follow "Event monitoring"
     And I set the field "Select a course" to "Course 1"
@@ -133,9 +136,10 @@ Feature: tool_monitor_subscriptions
     And I follow "Course 1"
     And I trigger cron
     And I am on site homepage
-    When I follow "Messages" in the user menu
-    And I follow "Do not reply to this email (1)"
-    Then I should see "The course was viewed."
+    When I click on ".popover-region-notifications" "css_element"
+    And I click on "View more" "link" in the ".popover-region-notifications" "css_element"
+    Then I should see "New rule course level"
+    And I should see "The course was viewed"
 
   Scenario: Navigating via quick link to rules
     Given I log in as "admin"

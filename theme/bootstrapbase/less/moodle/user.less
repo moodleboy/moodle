@@ -53,6 +53,55 @@
     }
 }
 
+/**
+ * This rule has been added to duplicate the style of icons with the
+ * .iconsmall class for consistent rendering.
+ *
+ * Loading a pix icon using the template helper returns icons with
+ * the class 'smallicon' instead of 'iconsmall'.
+ */
+#page-user-profile {
+    .ajax-contact-button {
+        img {
+            &.smallicon {
+                margin: 0;
+                padding: 0.3em;
+                height: 12px;
+                width: 12px;
+                vertical-align: middle;
+            }
+        }
+    }
+}
+
+.ajax-contact-button {
+    box-sizing: border-box;
+    position: relative;
+
+    &.loading {
+        .loading-icon {
+            display: block;
+        }
+    }
+
+    .loading-icon {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.7);
+
+        .smallicon {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+    }
+}
+
 @media (max-width: 480px) {
     .userprofile .profile_tree {
         /** Display the profile on one column on phones. */

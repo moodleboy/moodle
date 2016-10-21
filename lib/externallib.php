@@ -724,6 +724,7 @@ function external_generate_token($tokentype, $serviceorid, $userid, $contextorid
     if (!empty($iprestriction)) {
         $newtoken->iprestriction = $iprestriction;
     }
+    $newtoken->privatetoken = null;
     $DB->insert_record('external_tokens', $newtoken);
     return $newtoken->token;
 }
@@ -815,11 +816,14 @@ class external_format_value extends external_value {
      *
      * @param string $textfieldname Name of the text field
      * @param int $required if VALUE_REQUIRED then set standard default FORMAT_HTML
+     * @param int $default Default value.
      * @since Moodle 2.3
      */
-    public function __construct($textfieldname, $required = VALUE_REQUIRED) {
+    public function __construct($textfieldname, $required = VALUE_REQUIRED, $default = null) {
 
-        $default = ($required == VALUE_DEFAULT) ? FORMAT_HTML : null;
+        if ($default == null && $required == VALUE_DEFAULT) {
+            $default = FORMAT_HTML;
+        }
 
         $desc = $textfieldname . ' format (' . FORMAT_HTML . ' = HTML, '
                 . FORMAT_MOODLE . ' = MOODLE, '
@@ -1050,6 +1054,8 @@ function external_generate_token_for_current_user($service) {
             $token->externalserviceid = $service->id;
             // MDL-43119 Token valid for 3 months (12 weeks).
             $token->validuntil = $token->timecreated + 12 * WEEKSECS;
+            // Generate the private token, it must be transmitted only via https.
+            $token->privatetoken = random_string(64);
             $token->id = $DB->insert_record('external_tokens', $token);
 
             $params = array(

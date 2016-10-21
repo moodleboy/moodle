@@ -71,9 +71,9 @@ class behat_config_util {
     private $componentswithtests;
 
     /**
-     * @var bool keep track of theme to return suite with all core features included or not.
+     * @var array|string keep track of theme to return suite with all core features included or not.
      */
-    private $themesuitewithallfeatures = false;
+    private $themesuitewithallfeatures = array();
 
     /**
      * @var string filter features which have tags.
@@ -91,13 +91,26 @@ class behat_config_util {
     private $currentrun = 0;
 
     /**
+     * @var string used to specify if behat should be initialised with all themes.
+     */
+    const ALL_THEMES_TO_RUN = 'ALL';
+
+    /**
      * Set value for theme suite to include all core features. This should be used if your want all core features to be
      * run with theme.
      *
-     * @param bool $val
+     * @param bool $themetoset
      */
-    public function set_theme_suite_to_include_core_features($val) {
-        $this->themesuitewithallfeatures = $val;
+    public function set_theme_suite_to_include_core_features($themetoset) {
+        // If no value passed to --add-core-features-to-theme or ALL is passed, then set core features for all themes.
+        if (!empty($themetoset)) {
+            if (is_number($themetoset) || is_bool($themetoset) || (self::ALL_THEMES_TO_RUN === strtoupper($themetoset))) {
+                $this->themesuitewithallfeatures = self::ALL_THEMES_TO_RUN;
+            } else {
+                $this->themesuitewithallfeatures = explode(',', $themetoset);
+                $this->themesuitewithallfeatures = array_map('trim', $this->themesuitewithallfeatures);
+            }
+        }
     }
 
     /**
@@ -208,17 +221,24 @@ class behat_config_util {
             $features = array_merge($features, $additionalfeatures);
         }
 
-        $this->features = $features;
+        // Sanitize feature key.
+        $cleanfeatures = array();
+        foreach ($features as $featurepath) {
+            list($key, $path) = $this->get_clean_feature_key_and_path($featurepath);
+            $cleanfeatures[$key] = $path;
+        }
+
+        // Sort feature list.
+        ksort($cleanfeatures);
+
+        $this->features = $cleanfeatures;
 
         // If tags are passed then filter features which has sepecified tags.
         if (!empty($tags)) {
-            $features = $this->filtered_features_with_tags($features, $tags);
+            $cleanfeatures = $this->filtered_features_with_tags($cleanfeatures, $tags);
         }
 
-        // Return sorted list.
-        ksort($features);
-
-        return $features;
+        return $cleanfeatures;
     }
 
     /**
@@ -1020,7 +1040,8 @@ class behat_config_util {
         foreach ($themes as $theme) {
             // Get list of features which will be included in theme.
             // If theme suite with all features is set, then we want all core features to be part of theme suite.
-            if ($this->themesuitewithallfeatures) {
+            if ((is_string($this->themesuitewithallfeatures) && ($this->themesuitewithallfeatures === self::ALL_THEMES_TO_RUN)) ||
+                in_array($theme, $this->themesuitewithallfeatures)) {
                 // If there is no theme specific feature. Then it's just core features.
                 if (empty($themefeatures[$theme]['features'])) {
                     $themesuitefeatures = $features;
@@ -1220,6 +1241,7 @@ class behat_config_util {
         // Get list of features defined by theme.
         $themefeatures = $this->get_tests_for_theme($theme, 'features');
         $themeblacklistfeatures = $this->get_blacklisted_tests_for_theme($theme, 'features');
+        $themeblacklisttags = $this->get_blacklisted_tests_for_theme($theme, 'tags');
 
         // Clean feature key and path.
         $features = array();
@@ -1232,6 +1254,26 @@ class behat_config_util {
         foreach ($themeblacklistfeatures as $themeblacklistfeature) {
             list($blacklistfeaturekey, $blacklistfeaturepath) = $this->get_clean_feature_key_and_path($themeblacklistfeature);
             $blacklistfeatures[$blacklistfeaturekey] = $blacklistfeaturepath;
+        }
+
+        // If blacklist tags then add those features to list.
+        if (!empty($themeblacklisttags)) {
+            // Remove @ if given, so we are sure we have only tag names.
+            $themeblacklisttags = array_map(function($v) {
+                return ltrim($v, '@');
+            }, $themeblacklisttags);
+
+            $themeblacklisttags = '@' . implode(',@', $themeblacklisttags);
+            $blacklistedfeatureswithtag = $this->filtered_features_with_tags($this->get_components_features(),
+                $themeblacklisttags);
+
+            // Add features with blacklisted tags.
+            if (!empty($blacklistedfeatureswithtag)) {
+                foreach ($blacklistedfeatureswithtag as $themeblacklistfeature) {
+                    list($key, $path) = $this->get_clean_feature_key_and_path($themeblacklistfeature);
+                    $blacklistfeatures[$key] = $path;
+                }
+            }
         }
 
         ksort($features);

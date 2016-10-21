@@ -165,6 +165,13 @@
 
     .iconcol {
         padding: 3px;
+        box-sizing: content-box;
+
+        .icon {
+            margin: 0;
+            width: 12px;
+            height: 12px;
+        }
     }
 
     label {
@@ -207,10 +214,23 @@
     margin-right: 0.3em;
 }
 
-body.path-question-type .fitem_fgroup .accesshide {
-    font: inherit;
-    position: static;
-    padding-right: .3em;
+body.path-question-type {
+    /* Hacks to display the labels within a form group. */
+    .fitem_fgroup .accesshide {
+        font: inherit;
+        position: static;
+        padding-right: .3em;
+    }
+    .form-group .sr-only {
+        position: static;
+        width: auto;
+        height: auto;
+        padding: 0;
+        margin: 0;
+        overflow: visible;
+        clip: auto;
+        border: 0;
+    }
 }
 
 .que {
@@ -419,6 +439,17 @@ body.path-question-type .fitem_fgroup .accesshide {
 }
 
 // imported from quiz.css
+
+#page-mod-quiz-edit ul.slots .activityinstance {
+    > a {
+        display: inline;
+        text-indent: 0;
+        padding-left: 0;
+    }
+    img.activityicon {
+        margin-left: 0;
+    }
+}
 
 #page-mod-quiz-edit .box.generalbox.questionbank {
     padding: 0.5em;
