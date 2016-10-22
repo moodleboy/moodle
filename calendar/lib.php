@@ -3340,7 +3340,7 @@ function calendar_get_calendar_context($subscription) {
 }
 
 /**
- * Get minutes in current day, required for all day events during DST transitions
+ * Get minutes in current day, required for all day events during DST transitions.
  *
  * @param int  $startdate The timestamp of start date of event
  * @return int Number of total minutes in the given day

@@ -202,7 +202,7 @@ foreach($events as $event) {
     $ev->add_property('dtstamp', Bennu::timestamp_to_datetime()); // now
     if ($event->timeduration == ((calendar_get_minutes_day($event->timestart) - 1) * MINSECS) &&
 	        $event->timestart == strtotime(date('d-m-Y H:i:s', strtotime('today', $event->timestart)))) {
-        // If event starts at midnight, and if duration is one minute less than the total number of minutes in the day,
+        // If event starts at midnight and if duration is one minute less than the total number of minutes in the day,
 		// then it is an all day event.
         $ev->add_property('dtstart', Bennu::timestamp_to_date($event->timestart), array('value' => 'DATE')); // All day event.
         $ev->add_property('dtend', Bennu::timestamp_to_date($event->timestart + DAYSECS), array('value' => 'DATE')); // All day.

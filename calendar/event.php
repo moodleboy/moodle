@@ -157,6 +157,7 @@ $mform->set_data($properties);
 $data = $mform->get_data();
 if ($data) {
     if ($allday == 1) {
+        // For all day event, set the duration to one minute less than total minutes in day.
         $data->timeduration = (calendar_get_minutes_day($data->timestart) - 1) * MINSECS;
         $data->timestart = strtotime("midnight", ($data->timestart));
     } else if ($data->duration == 1) {

@@ -181,7 +181,7 @@ class event_form extends moodleform {
     }
 
     /**
-     * A bit of custom validation for this form
+     * A bit of custom validation for this form.
      *
      * @param array $data An assoc array of field=>value
      * @param array $files An array of files
